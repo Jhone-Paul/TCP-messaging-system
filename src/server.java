@@ -1,38 +1,37 @@
-import java.net.*;
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.*;
+import java.io.InputStreamReader;
+import java.net.ServerSocket;
+import java.net.Socket;
 
-public class server
-{
-	public static void main(String[] args) throws IOException
-	{
-		ServerSocket sSocket = new ServerSocket(5001);
-		System.out.println("Listening for clients...");
-		Socket clientS = sSocket.accept();
-		String clientSocketIP = clientS.getInetAddress().toString();
-		int clientSocketPort = clientS.getPort();
- 		System.out.println("[IP: " + clientSocketIP + " ,Port: " + clientSocketPort +"]  " + "Client Connection Successful!");
-	   	DataInputStream dataIn = new DataInputStream(clientS.getInputStream());
-    	DataOutputStream dataOut = new DataOutputStream(clientS.getOutputStream());
+public class server {
 
-    	String clientMessage = dataIn.readUTF();
-		String prev = clientMessage;
-		System.out.println(clientMessage);
-		while (clientMessage != "quit") {
-			clientMessage = dataIn.readUTF();
-			if(clientMessage != prev) {
-				System.out.println(clientMessage);
-				prev = clientMessage;
-				dataOut.writeUTF("recieved message :)");
-			}
-		}
-    	System.out.println(clientMessage);
-    	String serverMessage = "Hi this is coming from Server!";
-    	dataOut.writeUTF(serverMessage);
+    public static void main(String[] args) {
+        try {
+            // Create a server socket listening on port 12345
+            ServerSocket serverSocket = new ServerSocket(12345);
+            System.out.println("Server is listening on port 12345");
 
-    	dataIn.close();
-    	dataOut.close();
-    	sSocket.close();
-    	clientS.close(); 
-	}
+            // Wait for a client to connect
+            Socket clientSocket = serverSocket.accept();
+            System.out.println("Client connected");
+
+            // Get the input stream of the client socket
+            BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+
+            // Read data from the client
+            String receivedData = in.readLine();
+            System.out.println("Received data: " + receivedData);
+
+            // Close the input stream and the client socket
+            in.close();
+            clientSocket.close();
+
+            // Close the server socket
+            serverSocket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }
+
